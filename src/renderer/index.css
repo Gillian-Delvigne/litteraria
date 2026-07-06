@@ -1,0 +1,19 @@
+@import url('https://fonts.googleapis.com/css2?family=Crimson+Pro:wght@300;400;600&family=DM+Sans:wght@400;500;700&display=swap');
+@import "tailwindcss";
+
+@theme {
+  --color-paper: #f9f6f1;
+  --color-ink: #2a2520;
+  --color-warm-gray: #8b7e74;
+  --color-accent-terra: #c67b5c;
+  --color-accent-sage: #7a9b76;
+
+  --font-display: 'Crimson Pro', serif;
+  --font-ui: 'DM Sans', sans-serif;
+}
+
+body {
+  margin: 0;
+  font-family: 'DM Sans', sans-serif;
+  background: linear-gradient(135deg, #f9f6f1 0%, #f2ebe0 100%);
+}
