@@ -7,6 +7,9 @@ contextBridge.exposeInMainWorld('electronAPI', {
     pick: () => ipcRenderer.invoke('workspace:pick'),
     listFiles: (workspacePath: string) =>
       ipcRenderer.invoke('workspace:listFiles', workspacePath),
-  },
-
+},
+  file: {
+		read: (filePath: string) => ipcRenderer.invoke('file:read', filePath),
+		write: (filePath: string, content:string) => ipcRenderer.invoke('file:write', filePath, content),
+	}
 });

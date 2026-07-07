@@ -6,8 +6,8 @@ const isDev = process.env.NODE_ENV === 'development';
 
 function createWindow() {
   const win = new BrowserWindow({
-    width: 1200,
-    height: 800,
+    width: 1500,
+    height: 900,
     webPreferences: {
       preload: path.join(__dirname, '../preload/index.cjs'),
       contextIsolation: true,
@@ -57,6 +57,30 @@ ipcMain.handle('workspace:listFiles', async (_, workspacePath: string) => {
     return [];
   }
 });
+
+// IPC: Read file
+ipcMain.handle('file:read', async (_, filePath: string) => {
+	try {
+		const fileContent = await fs.readFile(filePath, 'utf-8')
+		return fileContent
+	}
+	catch (error) {
+    	console.error('Erreur read file:', error);
+		return null
+	}
+})
+
+// IPC: Write file
+ipcMain.handle('file:write', async (_, filePath: string, content: string) => {
+	try {
+		await fs.writeFile(filePath, content)
+		return true
+	}
+	catch (error) {
+    	console.error('Erreur write file:', error);
+		return false
+	}
+})
 
 app.whenReady().then(() => {
   createWindow();
