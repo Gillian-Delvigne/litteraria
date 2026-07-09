@@ -26,7 +26,7 @@ export default function MainWorkspace({ workspacePath }: Props) {
                     onFileSelect={setSelectedFile}
                 />
             )}
-            <div className="flex-1 bg-paper p-8 min-h-0">
+            <div className={`flex-1 ${isFocusMode ? 'bg-black' : 'bg-paper'} p-8 min-h-0`}>
                 {selectedFile ? (
                     <div className="h-full flex flex-col">
                         {!isFocusMode && (

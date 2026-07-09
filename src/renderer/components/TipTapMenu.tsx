@@ -1,5 +1,4 @@
 import { useState } from "react";
-import { useTiptapState } from "@tiptap/react";
 import type { Editor } from "@tiptap/react";
 
 import {
@@ -13,6 +12,7 @@ import {
     Sun,
     MoonStar,
     Save,
+    Fullscreen,
 } from "lucide-react";
 
 interface Props {
@@ -24,7 +24,6 @@ interface Props {
 
 function ToolbarButton({
     onClick,
-    active,
     children,
     title,
     disabled,
@@ -66,11 +65,6 @@ export default function TipTapMenu({
     const setToolbarButtonState = () => {
         return fileExtension != "md";
     };
-
-    // const test = useTiptapState((disabled) => {
-    //     const text = disabled.editor.disabled;
-    //     console.log(text);
-    // });
 
     return (
         <div className="shrink-0 bg-white dark:bg-dark-paper dark:text-dark-ink h-12 w-full px-2 flex items-center gap-1 border-b border-gray-100 dark:border-white/10">
@@ -151,8 +145,16 @@ export default function TipTapMenu({
                 <ToolbarButton
                     title="Sauvegarder"
                     active={false}
+                    onClick={onToggleFocusMode}
+                    disabled={false}
+                >
+                    <Fullscreen size={16} />
+                </ToolbarButton>
+                <ToolbarButton
+                    title="Sauvegarder"
+                    active={false}
                     onClick={onSave}
-                    disabled=""
+                    disabled={false}
                 >
                     <Save size={16} />
                 </ToolbarButton>
@@ -160,7 +162,7 @@ export default function TipTapMenu({
                     title="Mode sombre/clair"
                     active={dark}
                     onClick={toggleDarkMode}
-                    disabled=""
+                    disabled={false}
                 >
                     {dark ? <MoonStar size={16} /> : <Sun size={16} />}
                 </ToolbarButton>
