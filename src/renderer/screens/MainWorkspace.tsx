@@ -18,7 +18,7 @@ export default function MainWorkspace({ workspacePath }: Props) {
     };
 
     return (
-        <div className="flex h-screen">
+        <div className="flex h-screen overflow-hidden">
             {!isFocusMode && (
                 <Sidebar
                     workspacePath={workspacePath}

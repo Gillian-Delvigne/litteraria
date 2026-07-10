@@ -17,6 +17,7 @@ export default function MainEditor({
     const [fileContent, setFileContent] = useState<string | null>(null);
     const [loadedFileItem, setLoadedFileItem] = useState(fileItem);
     const [wordCount, setWordCount] = useState(0);
+    const [charCount, setCharCount] = useState(0);
     const saveTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
     const updateWordCount = (text: string) => {
@@ -26,9 +27,16 @@ export default function MainEditor({
                 .split(/\s+/)
                 .filter((w) => w.length > 0);
             setWordCount(words.length);
+            setCharCount(
+                words.reduce((total, word) => {
+                    total += word.length;
+                    return total;
+                }, 0),
+            );
             return;
         }
         setWordCount(0);
+        setCharCount(0);
     };
 
     useEffect(() => {
@@ -134,7 +142,7 @@ export default function MainEditor({
     return (
         <div className="flex-1 min-h-0">
             <div
-                className="bg-white dark:bg-dark-paper dark:text-dark-ink rounded-lg shadow-sm scrollbar-thin border border-gray-50 dark:border-white/10 h-full flex flex-col"
+                className="bg-white dark:bg-dark-paper dark:text-dark-ink rounded-lg shadow-sm scrollbar-thin scrollbar-gutter-stable dark:scrollbar-thumb-ink dark:scrollbar-track-warm-gray border border-gray-50 dark:border-white/10 h-full flex flex-col w-full 2xl:max-w-4/5 m-auto"
                 id="main-editor"
             >
                 {loading || !editor ? (
@@ -145,12 +153,12 @@ export default function MainEditor({
                     <Tiptap editor={editor}>
                         <TipTapMenu
                             editor={editor}
-							fileExtension={getFileExtension(fileItem.name)}
+                            fileExtension={getFileExtension(fileItem.name)}
                             onSave={handleManualSave}
                             onToggleFocusMode={onToggleFocusMode}
                         />
-                        <Tiptap.Content className="flex-1 min-h-0 overflow-y-auto" />
-                        <WordCounter count={wordCount} />
+                        <Tiptap.Content className="flex-1 min-h-0 overflow-y-auto p-4" />
+                        <WordCounter wordCount={wordCount} charCount={charCount} />
                     </Tiptap>
                 )}
             </div>

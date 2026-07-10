@@ -36,16 +36,25 @@ function ToolbarButton({
 }) {
     console.log(disabled);
     return (
-        <button
-            disabled={disabled}
-            type="button"
-            title={title}
-            onClick={onClick}
-            className={`w-8 h-8 rounded-md flex items-center justify-center transition-colors 
-			 ${disabled ? "hover:bg-none cursor-not-allowed" : "dark:hover:bg-accent-terra hover:bg-gray-100"}`}
-        >
-            {children}
-        </button>
+        <div className="relative group">
+            <button
+                disabled={disabled}
+                type="button"
+                onClick={onClick}
+                className={`w-8 h-8 rounded-md flex items-center justify-center transition-colors 
+				${disabled ? "hover:bg-none cursor-not-allowed" : "dark:hover:bg-accent-terra hover:bg-gray-100"}`}
+            >
+                {children}
+            </button>
+            <span
+                className="absolute top-full left-1/2 -translate-x-1/2 mt-1 whitespace-nowrap
+                              opacity-0 group-hover:opacity-100 transition-opacity
+                              pointer-events-none z-20
+                              bg-ink dark:bg-dark-ink text-white dark:text-dark-paper text-xs px-2 py-1 rounded"
+            >
+                {title}
+            </span>
+        </div>
     );
 }
 
@@ -67,7 +76,7 @@ export default function TipTapMenu({
     };
 
     return (
-        <div className="shrink-0 bg-white dark:bg-dark-paper dark:text-dark-ink h-12 w-full px-2 flex items-center gap-1 border-b border-gray-100 dark:border-white/10">
+        <div className="shrink-0 bg-white dark:bg-dark-paper dark:text-dark-ink h-12 w-full px-2 flex items-center gap-1 border-b border-gray-100 dark:border-white/10 rounded-t-lg">
             <div className="flex items-center grow">
                 <ToolbarButton
                     title="Gras"
@@ -143,7 +152,7 @@ export default function TipTapMenu({
             <div className="w-px h-6 bg-gray-200 mx-1" />
             <div className="flex items-center">
                 <ToolbarButton
-                    title="Sauvegarder"
+                    title="Mode concentration"
                     active={false}
                     onClick={onToggleFocusMode}
                     disabled={false}
