@@ -1,6 +1,10 @@
-import type { FileItem } from "../types/electron";
+import type { WorkspaceItem } from "../../types/workspace";
 
-export default function WorkspaceHeader({ fileItem }: { fileItem: FileItem }) {
+export default function WorkspaceHeader({
+    fileItem,
+}: {
+    fileItem: WorkspaceItem;
+}) {
     return (
         <div>
             <h1 className="font-display text-3xl font-semibold text-ink mb-2">

@@ -34,7 +34,6 @@ function ToolbarButton({
     title: string;
     disabled: boolean;
 }) {
-    console.log(disabled);
     return (
         <div className="relative group">
             <button

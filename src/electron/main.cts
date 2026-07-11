@@ -1,6 +1,9 @@
 import { app, BrowserWindow, ipcMain, dialog} from 'electron';
 import fs from 'fs/promises';
 import path from 'node:path';
+import type { WorkspaceItem } from '../types/workspace' with {
+    "resolution-mode": "require"
+};
 
 const isDev = process.env.NODE_ENV === 'development';
 
@@ -23,39 +26,48 @@ function createWindow() {
   }
 }
 
+
 // IPC: Choose workspace
 ipcMain.handle('workspace:pick', async () => {
-  const result = await dialog.showOpenDialog({
-    properties: ['openDirectory', 'createDirectory'],
-    title: 'Choisir le dossier de ton répertoire de travail',
-  });
-
-  if (result.canceled) return null;
-
-  const workspacePath = result.filePaths[0];
-  return workspacePath;
+	const result = await dialog.showOpenDialog({
+		properties: ['openDirectory', 'createDirectory'],
+		title: 'Choisir le dossier de ton répertoire de travail',
+	});
+	
+	if (result.canceled) return null;
+	
+	const workspacePath = result.filePaths[0];
+	return workspacePath;
 });
+
+
+// List files recursively
+const listFiles = async (dir: string) : Promise<WorkspaceItem[]> => {
+	try {
+		const workspaceItems: WorkspaceItem[] = []
+		const entries = await fs.readdir(dir, { withFileTypes: true });
+		for (const entry of entries) {
+			if (entry.isFile() &&
+			(entry.name.endsWith('.md') || entry.name.endsWith('.txt') || entry.name.endsWith('.docx')))
+				workspaceItems.push({name: entry.name, path: entry.parentPath, type: "file"})
+			else if (entry.isDirectory()) {
+				const dirPath = path.join(entry.parentPath, entry.name);
+				const res = await listFiles(dirPath)
+				workspaceItems.push({name: entry.name, path: dirPath, type: "folder", children: res})
+			}
+		}
+		return workspaceItems
+	}
+	catch (error) {
+		console.error('Erreur listFiles:', error);
+		return [];
+	}
+}
 
 // IPC: List files from selected workspace
 ipcMain.handle('workspace:listFiles', async (_, workspacePath: string) => {
-  try {
-    const files = await fs.readdir(workspacePath, { withFileTypes: true });
-
-    const filtered = files
-      .filter(f =>
-        f.isFile() &&
-        (f.name.endsWith('.md') || f.name.endsWith('.txt') || f.name.endsWith('.docx'))
-      )
-      .map(f => ({
-        name: f.name,
-        path: path.join(workspacePath, f.name),
-      }));
-
-    return filtered;
-  } catch (error) {
-    console.error('Erreur listFiles:', error);
-    return [];
-  }
+    const files = await listFiles(workspacePath);
+	return files;
 });
 
 // IPC: Read file

@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from "react";
-import type { FileItem } from "../types/electron";
+import type { WorkspaceItem } from "../../types/workspace";
 import { Editor, Tiptap, useEditor } from "@tiptap/react";
 import { Markdown } from "@tiptap/markdown";
 import StarterKit from "@tiptap/starter-kit";
@@ -10,7 +10,7 @@ export default function MainEditor({
     fileItem,
     onToggleFocusMode,
 }: {
-    fileItem: FileItem;
+    fileItem: WorkspaceItem;
     onToggleFocusMode: () => void;
 }) {
     const [loading, setLoading] = useState(true);
@@ -100,7 +100,7 @@ export default function MainEditor({
 
     const extractContent = (
         editor: Editor,
-        fileItem: FileItem,
+        fileItem: WorkspaceItem,
     ): string | undefined => {
         const ext = getFileExtension(fileItem.name);
         switch (ext) {
@@ -158,7 +158,10 @@ export default function MainEditor({
                             onToggleFocusMode={onToggleFocusMode}
                         />
                         <Tiptap.Content className="flex-1 min-h-0 overflow-y-auto p-4" />
-                        <WordCounter wordCount={wordCount} charCount={charCount} />
+                        <WordCounter
+                            wordCount={wordCount}
+                            charCount={charCount}
+                        />
                     </Tiptap>
                 )}
             </div>

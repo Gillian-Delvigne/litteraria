@@ -1,10 +1,10 @@
 import { useEffect, useState } from "react";
-import type { FileItem } from "../types/electron";
+import type { WorkspaceItem } from "../../types/workspace";
 
 interface Props {
     workspacePath: string;
-    selectedFile: FileItem | null;
-    onFileSelect: (file: FileItem) => void;
+    selectedFile: WorkspaceItem | null;
+    onFileSelect: (file: WorkspaceItem) => void;
 }
 
 function getFileIcon(fileName: string) {
@@ -19,7 +19,7 @@ export default function Sidebar({
     selectedFile,
     onFileSelect,
 }: Props) {
-    const [files, setFiles] = useState<FileItem[]>([]);
+    const [files, setFiles] = useState<WorkspaceItem[]>([]);
     const [loading, setLoading] = useState(true);
     const [loadedWorkspace, setLoadedWorkspace] = useState(workspacePath);
 
