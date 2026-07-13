@@ -1,33 +1,27 @@
 import { useEffect, useState } from "react";
 import type { WorkspaceItem } from "../../types/workspace";
+import WorkspaceItemTree from "./WorkspaceItemTree";
 
 interface Props {
     workspacePath: string;
-    selectedFile: WorkspaceItem | null;
-    onFileSelect: (file: WorkspaceItem) => void;
-}
-
-function getFileIcon(fileName: string) {
-    if (fileName.endsWith(".md")) return "📝";
-    if (fileName.endsWith(".txt")) return "📄";
-    if (fileName.endsWith(".docx")) return "📑";
-    return "📄";
+    selectedItem: WorkspaceItem | null;
+    onItemSelect: (item: WorkspaceItem | null) => void;
 }
 
 export default function Sidebar({
     workspacePath,
-    selectedFile,
-    onFileSelect,
+    selectedItem,
+    onItemSelect,
 }: Props) {
-    const [files, setFiles] = useState<WorkspaceItem[]>([]);
+    const [workspaceItems, setWorkspaceItems] = useState<WorkspaceItem[]>([]);
     const [loading, setLoading] = useState(true);
     const [loadedWorkspace, setLoadedWorkspace] = useState(workspacePath);
 
-    const loadFiles = async () => {
+    const loadItems = async () => {
         setLoading(true);
         const list =
-            await window.electronAPI.workspace.listFiles(workspacePath);
-        setFiles(list);
+            await window.electronAPI.workspace.listItems(workspacePath);
+        setWorkspaceItems(list);
         setLoading(false);
     };
 
@@ -38,9 +32,9 @@ export default function Sidebar({
 
     useEffect(() => {
         let ignore = false;
-        window.electronAPI.workspace.listFiles(workspacePath).then((list) => {
+        window.electronAPI.workspace.listItems(workspacePath).then((list) => {
             if (!ignore) {
-                setFiles(list);
+                setWorkspaceItems(list);
                 setLoading(false);
             }
         });
@@ -67,7 +61,7 @@ export default function Sidebar({
                 <div className="flex items-center justify-between mb-4 font-ui text-sm uppercase tracking-wide font-semibold text-white/70">
                     <span>Fichiers</span>
                     <button
-                        onClick={loadFiles}
+                        onClick={loadItems}
                         title="Actualiser"
                         className="w-6 h-6 rounded-md bg-white/10 hover:bg-white/20 transition-colors flex items-center justify-center text-xs"
                     >
@@ -79,30 +73,19 @@ export default function Sidebar({
                     <p className="font-ui text-sm text-white/50">
                         Chargement...
                     </p>
-                ) : files.length === 0 ? (
+                ) : workspaceItems.length === 0 ? (
                     <p className="font-ui text-sm text-white/50">
-                        Aucun fichier .md, .txt ou .docx trouvé.
+                        Aucun élément trouvé.
                     </p>
                 ) : (
                     <ul className="space-y-2">
-                        {files.map((file) => (
-                            <li key={file.path}>
-                                <button
-                                    onClick={() => onFileSelect(file)}
-                                    className={`w-full text-left px-3 py-3 rounded-lg flex items-center gap-3 font-ui text-[0.9375rem] transition-colors ${
-                                        selectedFile?.path === file.path
-                                            ? "bg-accent-terra font-medium"
-                                            : "hover:bg-white/10"
-                                    }`}
-                                >
-                                    <span className="opacity-70">
-                                        {getFileIcon(file.name)}
-                                    </span>
-                                    <span className="truncate">
-                                        {file.name}
-                                    </span>
-                                </button>
-                            </li>
+                        {workspaceItems.map((item) => (
+                            <WorkspaceItemTree
+								key={item.path}
+                                item={item}
+                                selectedItem={selectedItem}
+                                onItemSelect={onItemSelect}
+                            />
                         ))}
                     </ul>
                 )}

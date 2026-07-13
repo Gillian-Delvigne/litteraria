@@ -41,33 +41,33 @@ ipcMain.handle('workspace:pick', async () => {
 });
 
 
-// List files recursively
-const listFiles = async (dir: string) : Promise<WorkspaceItem[]> => {
+// List items recursively
+const listWorkspaceItems = async (dir: string) : Promise<WorkspaceItem[]> => {
 	try {
 		const workspaceItems: WorkspaceItem[] = []
 		const entries = await fs.readdir(dir, { withFileTypes: true });
 		for (const entry of entries) {
+			const itemPath = path.join(entry.parentPath, entry.name);
 			if (entry.isFile() &&
 			(entry.name.endsWith('.md') || entry.name.endsWith('.txt') || entry.name.endsWith('.docx')))
-				workspaceItems.push({name: entry.name, path: entry.parentPath, type: "file"})
+				workspaceItems.push({name: entry.name, path: itemPath, type: "file"})
 			else if (entry.isDirectory()) {
-				const dirPath = path.join(entry.parentPath, entry.name);
-				const res = await listFiles(dirPath)
-				workspaceItems.push({name: entry.name, path: dirPath, type: "folder", children: res})
+				const res = await listWorkspaceItems(itemPath)
+				workspaceItems.push({name: entry.name, path: itemPath, type: "folder", children: res})
 			}
 		}
 		return workspaceItems
 	}
 	catch (error) {
-		console.error('Erreur listFiles:', error);
+		console.error('Erreur listWorkspaceItems:', error);
 		return [];
 	}
 }
 
-// IPC: List files from selected workspace
-ipcMain.handle('workspace:listFiles', async (_, workspacePath: string) => {
-    const files = await listFiles(workspacePath);
-	return files;
+// IPC: List items from selected workspace
+ipcMain.handle('workspace:listItems', async (_, workspacePath: string) => {
+    const items = await listWorkspaceItems(workspacePath);
+	return items;
 });
 
 // IPC: Read file

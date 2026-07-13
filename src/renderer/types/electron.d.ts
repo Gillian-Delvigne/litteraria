@@ -2,7 +2,7 @@ export interface ElectronAPI {
   platform: string;
   workspace: {
     pick: () => Promise<string | null>;
-    listFiles: (workspacePath: string) => Promise<WorkspaceItem[]>;
+    listItems: (workspacePath: string) => Promise<WorkspaceItem[]>;
 };
 	file: {
 		read: (filePath: string) => Promise<string | null>;

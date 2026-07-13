@@ -10,7 +10,7 @@ interface Props {
 }
 
 export default function MainWorkspace({ workspacePath }: Props) {
-    const [selectedFile, setSelectedFile] = useState<WorkspaceItem | null>(
+    const [selectedItem, setSelectedItem] = useState<WorkspaceItem | null>(
         null,
     );
     const [isFocusMode, setIsFocusMode] = useState(false);
@@ -24,20 +24,20 @@ export default function MainWorkspace({ workspacePath }: Props) {
             {!isFocusMode && (
                 <Sidebar
                     workspacePath={workspacePath}
-                    selectedFile={selectedFile}
-                    onFileSelect={setSelectedFile}
+                    selectedItem={selectedItem}
+                    onItemSelect={setSelectedItem}
                 />
             )}
             <div
                 className={`flex-1 ${isFocusMode ? "bg-black" : "bg-paper"} p-8 min-h-0`}
             >
-                {selectedFile ? (
+                {selectedItem ? (
                     <div className="h-full flex flex-col">
                         {!isFocusMode && (
-                            <WorkspaceHeader fileItem={selectedFile} />
+                            <WorkspaceHeader fileItem={selectedItem} />
                         )}
                         <Editor
-                            fileItem={selectedFile}
+                            fileItem={selectedItem}
                             onToggleFocusMode={onToggleFocusMode}
                         />
                     </div>
@@ -46,7 +46,7 @@ export default function MainWorkspace({ workspacePath }: Props) {
                         <div className="text-center text-warm-gray">
                             <div className="text-6xl mb-4">📝</div>
                             <p className="font-ui text-xl">
-                                Sélectionne un fichier pour commencer
+                                Aucun fichier sélectionné
                             </p>
                         </div>
                     </div>
