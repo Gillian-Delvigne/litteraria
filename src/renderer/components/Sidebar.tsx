@@ -17,7 +17,8 @@ export default function Sidebar({
     const [loading, setLoading] = useState(true);
     const [loadedWorkspace, setLoadedWorkspace] = useState(workspacePath);
 
-    const loadItems = async () => {
+    const loadItems = async (event: React.MouseEvent<HTMLElement>) => {
+        event.stopPropagation();
         setLoading(true);
         const list =
             await window.electronAPI.workspace.listItems(workspacePath);
@@ -46,6 +47,13 @@ export default function Sidebar({
     const workspaceName =
         workspacePath.split("/").filter(Boolean).pop() ?? workspacePath;
 
+    const handleSidebarRightClick = async (
+        event: React.MouseEvent<HTMLElement>,
+    ) => {
+        event.preventDefault();
+        await window.electronAPI.workspace.item.showContextMenu(null);
+    };
+
     return (
         <aside className="w-64 h-screen bg-linear-to-b from-ink to-[#3a342f] text-white p-6 flex flex-col gap-8 shrink-0">
             <div>
@@ -57,7 +65,10 @@ export default function Sidebar({
                 </div>
             </div>
 
-            <div className="flex-1 overflow-y-auto">
+            <div
+                className="flex-1 overflow-y-auto"
+                onContextMenu={handleSidebarRightClick}
+            >
                 <div className="flex items-center justify-between mb-4 font-ui text-sm uppercase tracking-wide font-semibold text-white/70">
                     <span>Fichiers</span>
                     <button
@@ -81,7 +92,7 @@ export default function Sidebar({
                     <ul className="space-y-2">
                         {workspaceItems.map((item) => (
                             <WorkspaceItemTree
-								key={item.path}
+                                key={item.path}
                                 item={item}
                                 selectedItem={selectedItem}
                                 onItemSelect={onItemSelect}

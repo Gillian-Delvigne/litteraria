@@ -1,13 +1,13 @@
 export type WorkspaceItem = {
-  name: string;
-  path: string;
+    name: string;
+    path: string;
 } & (FolderItem | FileItem);
 
 export type FileItem = {
-  type: "file";
-}
+    type: "file";
+};
 
 export type FolderItem = {
-  type: "folder";
-  children: Array<WorkspaceItem>;
-}
+    type: "folder";
+    children: Array<WorkspaceItem>;
+};

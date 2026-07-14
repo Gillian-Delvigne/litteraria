@@ -1,5 +1,3 @@
-import React from "react";
-
 interface Props {
     onWorkspaceSelected: (path: string) => void;
 }
@@ -13,7 +11,7 @@ export default function WorkspacePicker({ onWorkspaceSelected }: Props) {
     };
 
     return (
-        <div className="min-h-screen bg-linear-to-br from-paper to-[#f2ebe0] flex items-center justify-center p-8">
+        <div className="min-h-screen bg-linear-to-br from-paper to-dark-ink flex items-center justify-center p-8">
             <div className="max-w-2xl w-full text-center">
                 <h1 className="font-display text-6xl font-semibold text-ink mb-4">
                     LitterarIA

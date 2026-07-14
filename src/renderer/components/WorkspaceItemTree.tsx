@@ -20,12 +20,21 @@ export default function WorkspaceItemTree({
 }: Props) {
     const [isItemToggle, setIsItemToggle] = useState(false);
 
+    const handleItemRightclick = async (
+        event: React.MouseEvent<HTMLElement>,
+    ) => {
+        event.preventDefault();
+        event.stopPropagation();
+        await window.electronAPI.workspace.item.showContextMenu(item);
+    };
+
     if (item.type === "file") {
         return (
             <li key={item.path}>
                 <button
                     onClick={() => onItemSelect(item)}
-                    className={`w-full text-left px-3 py-3 rounded-lg flex items-center gap-3 font-ui text-[0.9375rem] transition-colors ${
+                    onContextMenu={handleItemRightclick}
+                    className={`w-full text-left p-2 rounded-lg flex items-center gap-3 font-ui text-[0.9375rem] transition-colors ${
                         selectedItem?.path === item.path
                             ? "bg-accent-terra font-medium"
                             : "hover:bg-white/10"
@@ -43,10 +52,10 @@ export default function WorkspaceItemTree({
                 <li key={item.path}>
                     <button
                         onClick={() => {
-                            onItemSelect(null);
                             setIsItemToggle(!isItemToggle);
                         }}
-                        className={`w-full text-left px-3 py-3 rounded-lg flex items-center gap-3 font-ui text-[0.9375rem] transition-colors ${
+                        onContextMenu={handleItemRightclick}
+                        className={`w-full text-left p-2 rounded-lg flex items-center gap-3 font-ui text-[0.9375rem] transition-colors ${
                             selectedItem?.path === item.path
                                 ? "bg-accent-terra font-medium"
                                 : "hover:bg-white/10"
@@ -64,7 +73,10 @@ export default function WorkspaceItemTree({
                         </span>
                     </button>
                 </li>
-                <ul className={`${!isItemToggle ? "hidden" : ""} pl-6`}>
+                <ul
+                    className={`${!isItemToggle ? "hidden" : ""} pl-6 folderlist`}
+                    onContextMenu={handleItemRightclick}
+                >
                     {item.children.map((child) => (
                         <WorkspaceItemTree
                             key={child.path}
