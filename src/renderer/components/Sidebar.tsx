@@ -106,18 +106,20 @@ export default function Sidebar({
                 return newItem;
             } else {
                 if (item.type === "folder") {
+                    const updatedChildren = updateItemPath(
+                        item.children,
+                        oldPath,
+                        newPath,
+                        newName,
+                    );
+                    if (updatedChildren === item.children) return item;
                     return {
                         ...item,
-                        children: updateItemPath(
-                            item.children,
-                            oldPath,
-                            newPath,
-                            newName,
-                        ),
+                        children: updatedChildren,
                     };
                 }
             }
-            return { ...item };
+            return item;
         });
     };
 
@@ -126,8 +128,8 @@ export default function Sidebar({
         newPath: string,
         newName: string,
     ) => {
-        setWorkspaceItems(
-            updateItemPath(workspaceItems, oldpath, newPath, newName),
+        setWorkspaceItems((prev) =>
+            updateItemPath(prev, oldpath, newPath, newName),
         );
     };
 
