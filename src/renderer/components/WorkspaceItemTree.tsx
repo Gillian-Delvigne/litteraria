@@ -5,7 +5,7 @@ import { WorkspaceItemName } from "./WorkspaceItemName";
 
 interface Props {
     item: WorkspaceItem;
-    selectedItem: WorkspaceItem | null;
+    selectedPath: string | null;
     onItemSelect: (item: WorkspaceItem | null) => void;
     renamingPath: string | null;
     onRenameComplete: (path: string | null) => void;
@@ -20,7 +20,7 @@ function getItemIcon(item: WorkspaceItem) {
 export default function WorkspaceItemTree({
     item,
     onItemSelect,
-    selectedItem,
+    selectedPath,
     renamingPath,
     onRenameComplete,
     onItemRenamed,
@@ -42,7 +42,7 @@ export default function WorkspaceItemTree({
                     onClick={() => onItemSelect(item)}
                     onContextMenu={handleItemRightclick}
                     className={`w-full text-left p-2 rounded-lg flex items-center gap-3 font-ui text-[0.9375rem] transition-colors ${
-                        selectedItem?.path === item.path
+                        selectedPath === item.path
                             ? "bg-accent-terra font-medium"
                             : "hover:bg-white/10"
                     }`}
@@ -68,7 +68,7 @@ export default function WorkspaceItemTree({
                         }}
                         onContextMenu={handleItemRightclick}
                         className={`w-full text-left p-2 rounded-lg flex items-center gap-3 font-ui text-[0.9375rem] transition-colors ${
-                            selectedItem?.path === item.path
+                            selectedPath === item.path
                                 ? "bg-accent-terra font-medium"
                                 : "hover:bg-white/10"
                         }`}
@@ -104,7 +104,7 @@ export default function WorkspaceItemTree({
                                 key={child.path}
                                 item={child}
                                 onItemSelect={onItemSelect}
-                                selectedItem={selectedItem}
+                                selectedPath={selectedPath}
                                 renamingPath={renamingPath}
                                 onRenameComplete={onRenameComplete}
                                 onItemRenamed={onItemRenamed}

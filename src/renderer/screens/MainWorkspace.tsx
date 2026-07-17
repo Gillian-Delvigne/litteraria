@@ -15,6 +15,8 @@ export default function MainWorkspace({ workspacePath }: Props) {
     );
     const [isFocusMode, setIsFocusMode] = useState(false);
 
+    const selectedPath = selectedItem?.path ?? null;
+
     const onToggleFocusMode = () => {
         setIsFocusMode(!isFocusMode);
     };
@@ -24,7 +26,7 @@ export default function MainWorkspace({ workspacePath }: Props) {
             {!isFocusMode && (
                 <Sidebar
                     workspacePath={workspacePath}
-                    selectedItem={selectedItem}
+                    selectedPath={selectedPath}
                     onItemSelect={setSelectedItem}
                 />
             )}

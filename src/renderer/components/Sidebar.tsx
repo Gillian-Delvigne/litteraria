@@ -4,13 +4,13 @@ import WorkspaceItemTree from "./WorkspaceItemTree";
 
 interface Props {
     workspacePath: string;
-    selectedItem: WorkspaceItem | null;
+    selectedPath: string | null;
     onItemSelect: (item: WorkspaceItem | null) => void;
 }
 
 export default function Sidebar({
     workspacePath,
-    selectedItem,
+    selectedPath,
     onItemSelect,
 }: Props) {
     const [workspaceItems, setWorkspaceItems] = useState<WorkspaceItem[]>([]);
@@ -173,7 +173,7 @@ export default function Sidebar({
                             <WorkspaceItemTree
                                 key={item.path}
                                 item={item}
-                                selectedItem={selectedItem}
+                                selectedPath={selectedPath}
                                 onItemSelect={onItemSelect}
                                 renamingPath={renamingPath}
                                 onRenameComplete={setrenamingPath}
