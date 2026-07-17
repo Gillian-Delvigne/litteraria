@@ -16,6 +16,7 @@ export default function Sidebar({
     const [workspaceItems, setWorkspaceItems] = useState<WorkspaceItem[]>([]);
     const [loading, setLoading] = useState(true);
     const [loadedWorkspace, setLoadedWorkspace] = useState(workspacePath);
+    const [renamingPath, setrenamingPath] = useState<string | null>(null);
 
     const loadItems = async (event: React.MouseEvent<HTMLElement>) => {
         event.stopPropagation();
@@ -52,6 +53,82 @@ export default function Sidebar({
     ) => {
         event.preventDefault();
         await window.electronAPI.workspace.item.showContextMenu(null);
+    };
+
+    useEffect(() => {
+        const listener = window.electronAPI.workspace.item.onRename((item) =>
+            setrenamingPath(item.path),
+        );
+        return listener;
+    }, []);
+
+    const bulkUpdateChildren = (
+        children: WorkspaceItem[],
+        oldPath: string,
+        newPath: string,
+    ): WorkspaceItem[] => {
+        return children.map((item) => {
+            const updatedItem = {
+                ...item,
+                path: newPath + item.path.slice(oldPath.length),
+            };
+            if (updatedItem.type === "folder")
+                return {
+                    ...updatedItem,
+                    children: bulkUpdateChildren(
+                        updatedItem.children,
+                        oldPath,
+                        newPath,
+                    ),
+                };
+            return updatedItem;
+        });
+    };
+
+    const updateItemPath = (
+        workspaceItems: WorkspaceItem[],
+        oldPath: string,
+        newPath: string,
+        newName: string,
+    ): WorkspaceItem[] => {
+        return workspaceItems.map((item: WorkspaceItem) => {
+            if (item.path === oldPath) {
+                const newItem = { ...item, path: newPath, name: newName };
+                if (item.type === "folder")
+                    return {
+                        ...newItem,
+                        children: bulkUpdateChildren(
+                            item.children,
+                            oldPath,
+                            newPath,
+                        ),
+                    };
+                return newItem;
+            } else {
+                if (item.type === "folder") {
+                    return {
+                        ...item,
+                        children: updateItemPath(
+                            item.children,
+                            oldPath,
+                            newPath,
+                            newName,
+                        ),
+                    };
+                }
+            }
+            return { ...item };
+        });
+    };
+
+    const updateWorkspaceItems = (
+        oldpath: string,
+        newPath: string,
+        newName: string,
+    ) => {
+        setWorkspaceItems(
+            updateItemPath(workspaceItems, oldpath, newPath, newName),
+        );
     };
 
     return (
@@ -96,6 +173,9 @@ export default function Sidebar({
                                 item={item}
                                 selectedItem={selectedItem}
                                 onItemSelect={onItemSelect}
+                                renamingPath={renamingPath}
+                                onRenameComplete={setrenamingPath}
+                                onItemRenamed={updateWorkspaceItems}
                             />
                         ))}
                     </ul>

@@ -1,3 +1,6 @@
+import type { WorkspaceItem } from "../types/workspace"
+import type { Result } from "../types/result"
+
 export interface ElectronAPI {
     platform: string;
     workspace: {
@@ -6,7 +9,11 @@ export interface ElectronAPI {
         item: {
             showContextMenu: (item: WorkspaceItem | null) => Promise<void>;
             create: () => Promise;
-            rename: () => Promise;
+            rename: (
+                item: WorkspaceItem,
+                newName: string,
+            ) => Promise<Result<{ path: string; name: string }>>;
+            onRename: (callback: (item: WorkspaceItem) => void) => () => void;
             copy: () => Promise;
             move: () => Promise;
             delete: () => Promise;

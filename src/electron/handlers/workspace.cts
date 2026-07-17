@@ -55,7 +55,7 @@ const listWorkspaceItems = async (
     }
 };
 
-export function registerWorkspaceHandlers() {
+export const registerWorkspaceHandlers = () => {
     ipcMain.handle("workspace:pick", pickWorkspace);
     ipcMain.handle("workspace:listItems", listWorkspaceItems);
-}
+};
