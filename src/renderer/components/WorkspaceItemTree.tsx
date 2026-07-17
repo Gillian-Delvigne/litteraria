@@ -1,6 +1,7 @@
 import { useState } from "react";
 import type { WorkspaceItem } from "../../types/workspace";
 import { ChevronRight, ChevronDown } from "lucide-react";
+import { WorkspaceItemName } from "./WorkspaceItemName";
 
 interface Props {
     item: WorkspaceItem;
@@ -25,7 +26,6 @@ export default function WorkspaceItemTree({
     onItemRenamed,
 }: Props) {
     const [isItemToggle, setIsItemToggle] = useState(false);
-    const [newName, setNewName] = useState(item.name);
 
     const handleItemRightclick = async (
         event: React.MouseEvent<HTMLElement>,
@@ -33,20 +33,6 @@ export default function WorkspaceItemTree({
         event.preventDefault();
         event.stopPropagation();
         await window.electronAPI.workspace.item.showContextMenu(item);
-    };
-
-    const confirmRename = async () => {
-        const result = await window.electronAPI.workspace.item.rename(
-            item,
-            newName,
-        );
-
-        if (result.status === "success") {
-            onItemRenamed(item.path, result.data.path, result.data.name);
-            onRenameComplete(null);
-        } else {
-            alert(result.message);
-        }
     };
 
     if (item.type === "file") {
@@ -62,20 +48,12 @@ export default function WorkspaceItemTree({
                     }`}
                 >
                     <span className="opacity-70">{getItemIcon(item)}</span>
-                    {renamingPath && item.path === renamingPath ? (
-                        <input
-                            name="rename-input"
-                            value={newName}
-                            onChange={(e) => setNewName(e.target.value)}
-                            autoFocus={true}
-                            onBlur={confirmRename}
-                            onKeyDown={(e) => {
-                                if (e.key === "Enter") confirmRename();
-                            }}
-                        />
-                    ) : (
-                        <span className="truncate">{item.name}</span>
-                    )}
+                    <WorkspaceItemName
+                        item={item}
+                        renamingPath={renamingPath}
+                        onRenameComplete={onRenameComplete}
+                        onItemRenamed={onItemRenamed}
+                    />
                 </button>
             </li>
         );
@@ -97,7 +75,12 @@ export default function WorkspaceItemTree({
                     >
                         {" "}
                         <span className="opacity-70">{getItemIcon(item)}</span>
-                        <span className="truncate">{item.name}</span>
+                        <WorkspaceItemName
+                            item={item}
+                            renamingPath={renamingPath}
+                            onRenameComplete={onRenameComplete}
+                            onItemRenamed={onItemRenamed}
+                        />
                         <span>
                             {isItemToggle ? (
                                 <ChevronDown size={16} />
