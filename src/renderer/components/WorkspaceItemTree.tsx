@@ -1,15 +1,11 @@
-import { useState } from "react";
+import React, { useState } from "react";
 import type { WorkspaceItem } from "../../types/workspace";
 import { ChevronRight, ChevronDown } from "lucide-react";
 import { WorkspaceItemName } from "./WorkspaceItemName";
+import { useSelectionContext } from "../contexts/WorkspaceHooks";
 
 interface Props {
     item: WorkspaceItem;
-    selectedPath: string | null;
-    onItemSelect: (item: WorkspaceItem | null) => void;
-    renamingPath: string | null;
-    onRenameComplete: (path: string | null) => void;
-    onItemRenamed: (oldPath: string, newPath: string, newName: string) => void;
 }
 
 function getItemIcon(item: WorkspaceItem) {
@@ -17,14 +13,8 @@ function getItemIcon(item: WorkspaceItem) {
     else return "📂";
 }
 
-export default function WorkspaceItemTree({
-    item,
-    onItemSelect,
-    selectedPath,
-    renamingPath,
-    onRenameComplete,
-    onItemRenamed,
-}: Props) {
+export const WorkspaceItemTree = React.memo(({ item }: Props) => {
+    const { selectedPath, onItemSelect } = useSelectionContext();
     const [isItemToggle, setIsItemToggle] = useState(false);
 
     const handleItemRightclick = async (
@@ -48,12 +38,7 @@ export default function WorkspaceItemTree({
                     }`}
                 >
                     <span className="opacity-70">{getItemIcon(item)}</span>
-                    <WorkspaceItemName
-                        item={item}
-                        renamingPath={renamingPath}
-                        onRenameComplete={onRenameComplete}
-                        onItemRenamed={onItemRenamed}
-                    />
+                    <WorkspaceItemName item={item} />
                 </button>
             </li>
         );
@@ -75,12 +60,7 @@ export default function WorkspaceItemTree({
                     >
                         {" "}
                         <span className="opacity-70">{getItemIcon(item)}</span>
-                        <WorkspaceItemName
-                            item={item}
-                            renamingPath={renamingPath}
-                            onRenameComplete={onRenameComplete}
-                            onItemRenamed={onItemRenamed}
-                        />
+                        <WorkspaceItemName item={item} />
                         <span>
                             {isItemToggle ? (
                                 <ChevronDown size={16} />
@@ -94,25 +74,21 @@ export default function WorkspaceItemTree({
                     className={`${!isItemToggle ? "hidden" : "border-l border-gray-400"} pl-6 ml-3 folderlist`}
                     onContextMenu={handleItemRightclick}
                 >
-                    {isItemToggle && item.children.length === 0 ? (
-                        <p className="text-xs text-gray-400 italic pl-3 py-1">
-                            Aucun fichier
-                        </p>
-                    ) : (
-                        item.children.map((child) => (
-                            <WorkspaceItemTree
-                                key={child.path}
-                                item={child}
-                                onItemSelect={onItemSelect}
-                                selectedPath={selectedPath}
-                                renamingPath={renamingPath}
-                                onRenameComplete={onRenameComplete}
-                                onItemRenamed={onItemRenamed}
-                            />
-                        ))
-                    )}
+                    {isItemToggle &&
+                        (item.children.length === 0 ? (
+                            <p className="text-xs text-gray-400 italic pl-3 py-1">
+                                Aucun fichier
+                            </p>
+                        ) : (
+                            item.children.map((child) => (
+                                <WorkspaceItemTree
+                                    key={child.path}
+                                    item={child}
+                                />
+                            ))
+                        ))}
                 </ul>
             </>
         );
     }
-}
+});

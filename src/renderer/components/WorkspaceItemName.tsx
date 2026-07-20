@@ -1,19 +1,14 @@
-import { useState } from "react";
+import React, { useState } from "react";
 import type { WorkspaceItem } from "../../types/workspace";
+import { useRenameContext } from "../contexts/WorkspaceHooks";
 
 interface Props {
     item: WorkspaceItem;
-    renamingPath: string | null;
-    onRenameComplete: (path: string | null) => void;
-    onItemRenamed: (oldPath: string, newPath: string, newName: string) => void;
 }
 
-export const WorkspaceItemName = ({
-    item,
-    renamingPath,
-    onRenameComplete,
-    onItemRenamed,
-}: Props) => {
+export const WorkspaceItemName = React.memo(({ item }: Props) => {
+    const { renamingPath, onRenameComplete, onItemRenamed } =
+        useRenameContext();
     const [newName, setNewName] = useState(item.name);
 
     const confirmRename = async () => {
@@ -48,4 +43,4 @@ export const WorkspaceItemName = ({
             )}
         </>
     );
-};
+});
