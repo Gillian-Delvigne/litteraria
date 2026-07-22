@@ -2,8 +2,13 @@ import { useMemo, type ReactNode } from "react";
 import type {
     SelectionContextProps,
     RenameContextProps,
+    ExpansionContextProps,
 } from "./WorkspaceHooks";
-import { SelectionContext, RenameContext } from "./WorkspaceHooks";
+import {
+    SelectionContext,
+    RenameContext,
+    ExpansionContext,
+} from "./WorkspaceHooks";
 
 export const SelectionContextProvider = ({
     children,
@@ -27,4 +32,16 @@ export const RenameContextProvider = ({
         [renamingPath, onRenameComplete, onItemRenamed],
     );
     return <RenameContext value={props}>{children}</RenameContext>;
+};
+
+export const ExpansionContextProvider = ({
+    children,
+    ...value
+}: ExpansionContextProps & { children: ReactNode }) => {
+    const { expandedPaths, onFolderExpanded } = value;
+    const props = useMemo(
+        () => ({ expandedPaths, onFolderExpanded }),
+        [expandedPaths, onFolderExpanded],
+    );
+    return <ExpansionContext value={props}>{children}</ExpansionContext>;
 };

@@ -12,12 +12,22 @@ export interface RenameContextProps {
     onItemRenamed: (oldPath: string, newPath: string, newName: string) => void;
 }
 
+export interface ExpansionContextProps {
+    expandedPaths: Set<string>;
+    onFolderExpanded: (path: string) => void;
+}
+
 export const SelectionContext = createContext<
     SelectionContextProps | undefined
 >(undefined);
+
 export const RenameContext = createContext<RenameContextProps | undefined>(
     undefined,
 );
+
+export const ExpansionContext = createContext<
+    ExpansionContextProps | undefined
+>(undefined);
 
 export const useSelectionContext = () => {
     const selectionState = useContext(SelectionContext);
@@ -32,7 +42,16 @@ export const useRenameContext = () => {
     const renameState = useContext(RenameContext);
     if (renameState === undefined)
         throw new Error(
-            "Le contexte de renommage doit être utlisé dans un Selection Provider",
+            "Le contexte de renommage doit être utlisé dans un Rename Provider",
         );
     return renameState;
+};
+
+export const useExpansionContext = () => {
+    const expansionContext = useContext(ExpansionContext);
+    if (expansionContext === undefined)
+        throw new Error(
+            "Le contexte d'expansion doit être utlisé dans un Expansion Provider",
+        );
+    return expansionContext;
 };
