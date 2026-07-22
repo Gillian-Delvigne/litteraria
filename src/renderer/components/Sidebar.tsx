@@ -76,6 +76,23 @@ const updateItemPath = (
     });
 };
 
+// Util function
+const updateExpandedPaths = (
+    expandedPaths: Set<string>,
+    oldPath: string,
+    newPath: string,
+): Set<string> => {
+    const updatedSet: Set<string> = new Set();
+    for (const path of expandedPaths) {
+        if (path === oldPath || path.startsWith(oldPath + "/")) {
+            const updatedPath = newPath + path.slice(oldPath.length);
+            updatedSet.add(updatedPath);
+        } else updatedSet.add(path);
+    }
+    return updatedSet;
+};
+
+// Sidebar component
 export default function Sidebar({
     workspacePath,
     selectedPath,
@@ -135,6 +152,9 @@ export default function Sidebar({
         (oldpath: string, newPath: string, newName: string) => {
             setWorkspaceItems((prev) =>
                 updateItemPath(prev, oldpath, newPath, newName),
+            );
+            setExpandedPaths((prev) =>
+                updateExpandedPaths(prev, oldpath, newPath),
             );
         },
         [],
