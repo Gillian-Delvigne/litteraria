@@ -1,11 +1,7 @@
 import { useEffect, useState, useCallback } from "react";
 import type { WorkspaceItem } from "../../types/workspace";
 import { WorkspaceItemTree } from "./WorkspaceItemTree";
-import {
-    ExpansionContextProvider,
-    SelectionContextProvider,
-} from "../contexts/WorkspaceTreeContext";
-import { RenameContextProvider } from "../contexts/WorkspaceTreeContext";
+import { SidebarContextProvider } from "./SidebarContextProvider";
 
 interface Props {
     workspacePath: string;
@@ -170,66 +166,60 @@ export default function Sidebar({
     }, []);
 
     return (
-        <RenameContextProvider
+        <SidebarContextProvider
+            selectedPath={selectedPath}
+            onItemSelect={onItemSelect}
             renamingPath={renamingPath}
             onRenameComplete={setrenamingPath}
             onItemRenamed={updateWorkspaceItems}
+            expandedPaths={expandedPaths}
+            onFolderExpanded={onFolderExpanded}
         >
-            <SelectionContextProvider
-                selectedPath={selectedPath}
-                onItemSelect={onItemSelect}
-            >
-                <ExpansionContextProvider
-                    expandedPaths={expandedPaths}
-                    onFolderExpanded={onFolderExpanded}
+            <aside className="w-64 h-screen bg-linear-to-b from-ink to-[#3a342f] text-white p-6 flex flex-col gap-8 shrink-0">
+                <div>
+                    <div className="font-display text-2xl font-semibold tracking-tight mb-1">
+                        LitterarIA
+                    </div>
+                    <div className="font-ui text-sm text-white/60 truncate">
+                        📁 {workspaceName}
+                    </div>
+                </div>
+
+                <div
+                    className="flex-1 overflow-y-auto"
+                    onContextMenu={handleSidebarRightClick}
                 >
-                    <aside className="w-64 h-screen bg-linear-to-b from-ink to-[#3a342f] text-white p-6 flex flex-col gap-8 shrink-0">
-                        <div>
-                            <div className="font-display text-2xl font-semibold tracking-tight mb-1">
-                                LitterarIA
-                            </div>
-                            <div className="font-ui text-sm text-white/60 truncate">
-                                📁 {workspaceName}
-                            </div>
-                        </div>
-
-                        <div
-                            className="flex-1 overflow-y-auto"
-                            onContextMenu={handleSidebarRightClick}
+                    <div className="flex items-center justify-between mb-4 font-ui text-sm uppercase tracking-wide font-semibold text-white/70">
+                        <span>Fichiers</span>
+                        <button
+                            onClick={loadItems}
+                            title="Actualiser"
+                            className="w-6 h-6 rounded-md bg-white/10 hover:bg-white/20 transition-colors flex items-center justify-center text-xs"
                         >
-                            <div className="flex items-center justify-between mb-4 font-ui text-sm uppercase tracking-wide font-semibold text-white/70">
-                                <span>Fichiers</span>
-                                <button
-                                    onClick={loadItems}
-                                    title="Actualiser"
-                                    className="w-6 h-6 rounded-md bg-white/10 hover:bg-white/20 transition-colors flex items-center justify-center text-xs"
-                                >
-                                    🔄
-                                </button>
-                            </div>
+                            🔄
+                        </button>
+                    </div>
 
-                            {loading ? (
-                                <p className="font-ui text-sm text-white/50">
-                                    Chargement...
-                                </p>
-                            ) : workspaceItems.length === 0 ? (
-                                <p className="font-ui text-sm text-white/50">
-                                    Aucun élément trouvé.
-                                </p>
-                            ) : (
-                                <ul className="space-y-2">
-                                    {workspaceItems.map((item) => (
-                                        <WorkspaceItemTree
-                                            key={item.path}
-                                            item={item}
-                                        />
-                                    ))}
-                                </ul>
-                            )}
-                        </div>
-                    </aside>
-                </ExpansionContextProvider>
-            </SelectionContextProvider>
-        </RenameContextProvider>
+                    {loading ? (
+                        <p className="font-ui text-sm text-white/50">
+                            Chargement...
+                        </p>
+                    ) : workspaceItems.length === 0 ? (
+                        <p className="font-ui text-sm text-white/50">
+                            Aucun élément trouvé.
+                        </p>
+                    ) : (
+                        <ul className="space-y-2">
+                            {workspaceItems.map((item) => (
+                                <WorkspaceItemTree
+                                    key={item.path}
+                                    item={item}
+                                />
+                            ))}
+                        </ul>
+                    )}
+                </div>
+            </aside>
+        </SidebarContextProvider>
     );
 }
