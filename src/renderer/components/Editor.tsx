@@ -1,9 +1,10 @@
 import { useState, useEffect, useRef } from "react";
 import type { WorkspaceItem } from "../../types/workspace";
 import { Editor, Tiptap, useEditor } from "@tiptap/react";
+import { EditorState } from "prosemirror-state";
 import { Markdown } from "@tiptap/markdown";
 import StarterKit from "@tiptap/starter-kit";
-import TipTapMenu from "./TipTapMenu";
+import TipTapMenu from "./TipTapToolbar/TipTapMenu";
 import WordCounter from "./WordCounter";
 
 export default function MainEditor({
@@ -38,34 +39,6 @@ export default function MainEditor({
         setWordCount(0);
         setCharCount(0);
     };
-
-    useEffect(() => {
-        let ignore = false;
-
-        const updateFileContent = (content: string) => {
-            setFileContent(content);
-            updateWordCount(content);
-        };
-
-        window.electronAPI.file
-            .read(fileItem.path)
-            .then((content) => {
-                if (!ignore) {
-                    updateFileContent(content ?? "");
-                    setLoading(false);
-                }
-            })
-            .catch((error) => {
-                console.error("Erreur chargement fichier:", error);
-                if (!ignore) {
-                    updateFileContent("");
-                    setLoading(false);
-                }
-            });
-        return () => {
-            ignore = true;
-        };
-    }, [fileItem]);
 
     if (loadedFileItem !== fileItem) {
         setLoading(true);
@@ -135,8 +108,41 @@ export default function MainEditor({
     });
 
     useEffect(() => {
-        if (!editor || loading) return;
-        editor.commands.setContent(fileContent, { contentType: "markdown" });
+        let ignore = false;
+
+        const updateFileContent = (content: string) => {
+            setFileContent(content);
+            if (!editor || loading) return;
+            editor.commands.setContent(fileContent, {
+                contentType: "markdown",
+            });
+            const newEditorState = EditorState.create({
+                doc: editor.state.doc,
+                plugins: editor.state.plugins,
+                schema: editor.state.schema,
+            });
+            editor.view.updateState(newEditorState);
+            updateWordCount(content);
+        };
+
+        window.electronAPI.file
+            .read(fileItem.path)
+            .then((content) => {
+                if (!ignore) {
+                    updateFileContent(content ?? "");
+                    setLoading(false);
+                }
+            })
+            .catch((error) => {
+                console.error("Erreur chargement fichier:", error);
+                if (!ignore) {
+                    updateFileContent("");
+                    setLoading(false);
+                }
+            });
+        return () => {
+            ignore = true;
+        };
     }, [editor, loading, fileItem, fileContent]);
 
     return (
