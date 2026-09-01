@@ -5,20 +5,21 @@
 @custom-variant dark (&:where(.dark, .dark *));
 
 @theme {
-	/* Colors */
+    /* Colors */
     --color-paper: #f9f6f1;
     --color-ink: #2a2520;
     --color-warm-gray: #8b7e74;
     --color-accent-terra: #c67b5c;
     --color-accent-sage: #7a9b76;
-	--color-dark-paper: #1e1a17;
-	--color-dark-ink: #f2ebe0;
-	/* Fonts */
+    --color-dark-paper: #1e1a17;
+    --color-dark-ink: #f2ebe0;
+    /* Fonts */
     --font-display: "Crimson Pro", serif;
     --font-ui: "DM Sans", sans-serif;
 }
 
-html, body {
+html,
+body {
     height: 100%;
     overflow: hidden;
 }
@@ -36,4 +37,18 @@ body {
 .ProseMirror {
     white-space: pre-wrap;
     word-wrap: break-word;
+}
+
+.ProseMirror :not(pre) > code {
+    font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    font-size: 0.875em;
+    font-weight: 500;
+    background-color: color-mix(in srgb, currentColor 12%, transparent);
+    border-radius: 0.35rem;
+    padding: 0.15em 0.4em;
+}
+
+.ProseMirror :not(pre) > code::before,
+.ProseMirror :not(pre) > code::after {
+    content: none;
 }

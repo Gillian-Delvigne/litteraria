@@ -26,7 +26,7 @@ export const TipTapDropDown = ({
                     disabled={disabled}
                     type="button"
                     onClick={handleClick}
-                    className={`w-8 h-8 rounded-md flex items-center justify-center transition-colors 
+                    className={`w-8 h-8 rounded-md flex items-center justify-center transition-colors ${isToogle ? "dark:bg-accent-terra bg-gray-100" : ""}
 					${disabled ? "hover:bg-none text-gray-500" : "dark:hover:bg-accent-terra hover:bg-gray-100"}`}
                 >
                     {menuIcon}

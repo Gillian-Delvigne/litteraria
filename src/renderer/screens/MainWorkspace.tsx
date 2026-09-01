@@ -2,7 +2,7 @@ import { useState } from "react";
 import Sidebar from "../components/Sidebar";
 import Editor from "../components/Editor";
 
-import type { WorkspaceItem } from "../../types/workspace";
+import type { WorkspaceItem, FileStatus } from "../../types/workspace";
 import WorkspaceHeader from "../components/WorkspaceHeader";
 
 interface Props {
@@ -14,6 +14,10 @@ export default function MainWorkspace({ workspacePath }: Props) {
         null,
     );
     const [isFocusMode, setIsFocusMode] = useState(false);
+    const [fileStatus, setFileStatus] = useState<FileStatus>({
+        status: "saved",
+        timestamp: null,
+    });
 
     const selectedPath = selectedItem?.path ?? null;
 
@@ -36,10 +40,15 @@ export default function MainWorkspace({ workspacePath }: Props) {
                 {selectedItem ? (
                     <div className="h-full flex flex-col">
                         {!isFocusMode && (
-                            <WorkspaceHeader fileItem={selectedItem} />
+                            <WorkspaceHeader
+                                fileItem={selectedItem}
+                                fileStatus={fileStatus}
+                            />
                         )}
                         <Editor
                             fileItem={selectedItem}
+                            setFileStatus={setFileStatus}
+                            fileStatus={fileStatus}
                             onToggleFocusMode={onToggleFocusMode}
                         />
                     </div>

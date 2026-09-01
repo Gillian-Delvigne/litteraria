@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from "react";
-import type { WorkspaceItem } from "../../types/workspace";
+import type { FileStatus, WorkspaceItem } from "../../types/workspace";
 import { Editor, Tiptap, useEditor } from "@tiptap/react";
 import { EditorState } from "prosemirror-state";
 import { Markdown } from "@tiptap/markdown";
@@ -10,15 +10,19 @@ import WordCounter from "./WordCounter";
 export default function MainEditor({
     fileItem,
     onToggleFocusMode,
+    setFileStatus,
 }: {
     fileItem: WorkspaceItem;
     onToggleFocusMode: () => void;
+    setFileStatus: React.Dispatch<React.SetStateAction<FileStatus>>;
+    fileStatus: FileStatus;
 }) {
     const [loading, setLoading] = useState(true);
     const [fileContent, setFileContent] = useState<string | null>(null);
     const [loadedFileItem, setLoadedFileItem] = useState(fileItem);
     const [wordCount, setWordCount] = useState(0);
     const [charCount, setCharCount] = useState(0);
+    const [autoSave, setAutosave] = useState(false);
     const saveTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
     const updateWordCount = (text: string) => {
@@ -47,9 +51,12 @@ export default function MainEditor({
 
     const saveFile = async (content: string) => {
         try {
+            setFileStatus({ status: "saving" });
             await window.electronAPI.file.write(fileItem.path, content);
+            setFileStatus({ status: "saved", timestamp: Date.now() });
             console.log("Fichier sauvegardé:", fileItem.name);
         } catch (error) {
+            setFileStatus({ status: "error", message: error as string });
             console.error("Erreur sauvegarde:", error);
         }
     };
@@ -58,13 +65,20 @@ export default function MainEditor({
         if (value === undefined) return;
         updateWordCount(value);
 
+        setFileStatus({ status: "unsaved" });
+
         if (saveTimeoutRef.current) {
             clearTimeout(saveTimeoutRef.current);
         }
+        if (autoSave) {
+            saveTimeoutRef.current = setTimeout(() => {
+                saveFile(value);
+            }, 1000);
+        }
+    };
 
-        saveTimeoutRef.current = setTimeout(() => {
-            saveFile(value);
-        }, 3000);
+    const handleAutosave = () => {
+        setAutosave(!autoSave);
     };
 
     const getFileExtension = (filename: string) => {
@@ -79,10 +93,8 @@ export default function MainEditor({
         switch (ext) {
             case "txt":
                 return editor.getText({ blockSeparator: "\n\n" });
-                break;
             case "md":
                 return editor.getMarkdown();
-                break;
             default:
                 break;
         }
@@ -115,11 +127,13 @@ export default function MainEditor({
             if (!editor || loading) return;
             editor.commands.setContent(fileContent, {
                 contentType: "markdown",
+                emitUpdate: false,
             });
             const newEditorState = EditorState.create({
                 doc: editor.state.doc,
                 plugins: editor.state.plugins,
                 schema: editor.state.schema,
+                selection: editor.state.selection,
             });
             editor.view.updateState(newEditorState);
             updateWordCount(content);
@@ -162,6 +176,8 @@ export default function MainEditor({
                             fileExtension={getFileExtension(fileItem.name)}
                             onSave={handleManualSave}
                             onToggleFocusMode={onToggleFocusMode}
+                            onToggleAutosave={handleAutosave}
+                            autoSave={autoSave}
                         />
                         <Tiptap.Content className="flex-1 min-h-0 overflow-y-auto p-4" />
                         <WordCounter

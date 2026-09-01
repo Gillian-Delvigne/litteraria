@@ -1,4 +1,4 @@
-import { useEffect, useState, useCallback } from "react";
+import { useEffect, useState, useCallback, useRef } from "react";
 import type { WorkspaceItem } from "../../types/workspace";
 import { WorkspaceItemTree } from "./WorkspaceItemTree";
 import { SidebarContextProvider } from "./SidebarContextProvider";
@@ -99,6 +99,9 @@ export default function Sidebar({
     const [loadedWorkspace, setLoadedWorkspace] = useState(workspacePath);
     const [renamingPath, setrenamingPath] = useState<string | null>(null);
     const [expandedPaths, setExpandedPaths] = useState<Set<string>>(new Set());
+    const [sidebarWidth, setSidebarWidth] = useState<number>(320);
+    const [isResizing, setIsResizing] = useState(false);
+    const resizeRef = useRef({ posX: 0, sidebarWidth: 0 });
 
     const loadItems = async (event: React.MouseEvent<HTMLElement>) => {
         event.stopPropagation();
@@ -165,6 +168,36 @@ export default function Sidebar({
         });
     }, []);
 
+    const onResize = (e: React.MouseEvent<HTMLDivElement>) => {
+        setIsResizing(true);
+        resizeRef.current.posX = e.clientX;
+        resizeRef.current.sidebarWidth = sidebarWidth;
+    };
+
+    useEffect(() => {
+        if (!isResizing) return;
+
+        const onMouseMove = (e: MouseEvent) => {
+            const x = resizeRef.current.posX;
+            const currWidth = resizeRef.current.sidebarWidth;
+            const diff = Math.abs(resizeRef.current.posX - e.clientX);
+            const newWidth =
+                x > e.clientX ? currWidth - diff : currWidth + diff;
+            setSidebarWidth(newWidth);
+        };
+
+        const onMouseUp = () => {
+            setIsResizing(false);
+        };
+        window.addEventListener("mousemove", onMouseMove);
+        window.addEventListener("mouseup", onMouseUp);
+
+        return () => {
+            window.removeEventListener("mousemove", onMouseMove);
+            window.removeEventListener("mouseup", onMouseUp);
+        };
+    }, [isResizing]);
+
     return (
         <SidebarContextProvider
             selectedPath={selectedPath}
@@ -175,49 +208,84 @@ export default function Sidebar({
             expandedPaths={expandedPaths}
             onFolderExpanded={onFolderExpanded}
         >
-            <aside className="w-64 h-screen bg-linear-to-b from-ink to-[#3a342f] text-white p-6 flex flex-col gap-8 shrink-0">
-                <div>
-                    <div className="font-display text-2xl font-semibold tracking-tight mb-1">
-                        LitterarIA
+            <aside className="w-fit h-screen text-white flex">
+                <div
+                    style={{ width: sidebarWidth }}
+                    className="flex flex-col p-6 gap-8 shrink-0 bg-linear-to-b from-ink to-[#3a342f]"
+                >
+                    <div>
+                        <div className="font-display text-2xl font-semibold tracking-tight mb-1">
+                            LitterarIA
+                        </div>
+                        <div className="font-ui text-sm text-white/60 truncate">
+                            📁 {workspaceName}
+                        </div>
                     </div>
-                    <div className="font-ui text-sm text-white/60 truncate">
-                        📁 {workspaceName}
+
+                    <div
+                        className="flex-1 overflow-y-auto"
+                        onContextMenu={handleSidebarRightClick}
+                    >
+                        <div className="flex items-center justify-between mb-4 font-ui text-sm uppercase tracking-wide font-semibold text-white/70">
+                            <span>Fichiers</span>
+                            <button
+                                onClick={loadItems}
+                                title="Actualiser"
+                                className="w-6 h-6 rounded-md bg-white/10 hover:bg-white/20 transition-colors flex items-center justify-center text-xs"
+                            >
+                                🔄
+                            </button>
+                        </div>
+
+                        {loading ? (
+                            <p className="font-ui text-sm text-white/50">
+                                Chargement...
+                            </p>
+                        ) : workspaceItems.length === 0 ? (
+                            <p className="font-ui text-sm text-white/50">
+                                Aucun élément trouvé.
+                            </p>
+                        ) : (
+                            <ul className="space-y-1">
+                                {workspaceItems.map((item) => (
+                                    <WorkspaceItemTree
+                                        key={item.path}
+                                        item={item}
+                                    />
+                                ))}
+                            </ul>
+                        )}
                     </div>
                 </div>
-
                 <div
-                    className="flex-1 overflow-y-auto"
-                    onContextMenu={handleSidebarRightClick}
+                    onMouseDown={onResize}
+                    className="group w-3 cursor-col-resize"
                 >
-                    <div className="flex items-center justify-between mb-4 font-ui text-sm uppercase tracking-wide font-semibold text-white/70">
-                        <span>Fichiers</span>
-                        <button
-                            onClick={loadItems}
-                            title="Actualiser"
-                            className="w-6 h-6 rounded-md bg-white/10 hover:bg-white/20 transition-colors flex items-center justify-center text-xs"
+                    <div className="group-hover:bg-accent-terra py-2 rounded-b-lg w-3 h-full flex items-center">
+                        <svg
+                            className="w-3 h-3"
+                            viewBox="0 0 24 24"
+                            fill="none"
+                            xmlns="http://www.w3.org/2000/svg"
                         >
-                            🔄
-                        </button>
+                            <g id="SVGRepo_bgCarrier" stroke-width="0"></g>
+                            <g
+                                id="SVGRepo_tracerCarrier"
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                            ></g>
+                            <g id="SVGRepo_iconCarrier">
+                                {" "}
+                                <path
+                                    d="M12 12H12.01M12 6H12.01M12 18H12.01M13 12C13 12.5523 12.5523 13 12 13C11.4477 13 11 12.5523 11 12C11 11.4477 11.4477 11 12 11C12.5523 11 13 11.4477 13 12ZM13 18C13 18.5523 12.5523 19 12 19C11.4477 19 11 18.5523 11 18C11 17.4477 11.4477 17 12 17C12.5523 17 13 17.4477 13 18ZM13 6C13 6.55228 12.5523 7 12 7C11.4477 7 11 6.55228 11 6C11 5.44772 11.4477 5 12 5C12.5523 5 13 5.44772 13 6Z"
+                                    stroke="#000000"
+                                    strokeWidth="2"
+                                    strokeLinecap="round"
+                                    strokeLinejoin="round"
+                                ></path>{" "}
+                            </g>
+                        </svg>
                     </div>
-
-                    {loading ? (
-                        <p className="font-ui text-sm text-white/50">
-                            Chargement...
-                        </p>
-                    ) : workspaceItems.length === 0 ? (
-                        <p className="font-ui text-sm text-white/50">
-                            Aucun élément trouvé.
-                        </p>
-                    ) : (
-                        <ul className="space-y-2">
-                            {workspaceItems.map((item) => (
-                                <WorkspaceItemTree
-                                    key={item.path}
-                                    item={item}
-                                />
-                            ))}
-                        </ul>
-                    )}
                 </div>
             </aside>
         </SidebarContextProvider>
