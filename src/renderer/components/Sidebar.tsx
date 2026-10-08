@@ -1,4 +1,5 @@
 import { useEffect, useState, useCallback, useRef } from "react";
+import { MoreVertical } from "lucide-react";
 import type { WorkspaceItem } from "../../types/workspace";
 import { WorkspaceItemTree } from "./WorkspaceItemTree";
 import { SidebarContextProvider } from "./SidebarContextProvider";
@@ -259,33 +260,19 @@ export default function Sidebar({
                 </div>
                 <div
                     onMouseDown={onResize}
-                    className="group w-3 cursor-col-resize"
+                    className="group relative w-3 h-full flex items-center justify-center cursor-col-resize"
                 >
-                    <div className="group-hover:bg-accent-terra py-2 rounded-b-lg w-3 h-full flex items-center">
-                        <svg
-                            className="w-3 h-3"
-                            viewBox="0 0 24 24"
-                            fill="none"
-                            xmlns="http://www.w3.org/2000/svg"
-                        >
-                            <g id="SVGRepo_bgCarrier" stroke-width="0"></g>
-                            <g
-                                id="SVGRepo_tracerCarrier"
-                                strokeLinecap="round"
-                                strokeLinejoin="round"
-                            ></g>
-                            <g id="SVGRepo_iconCarrier">
-                                {" "}
-                                <path
-                                    d="M12 12H12.01M12 6H12.01M12 18H12.01M13 12C13 12.5523 12.5523 13 12 13C11.4477 13 11 12.5523 11 12C11 11.4477 11.4477 11 12 11C12.5523 11 13 11.4477 13 12ZM13 18C13 18.5523 12.5523 19 12 19C11.4477 19 11 18.5523 11 18C11 17.4477 11.4477 17 12 17C12.5523 17 13 17.4477 13 18ZM13 6C13 6.55228 12.5523 7 12 7C11.4477 7 11 6.55228 11 6C11 5.44772 11.4477 5 12 5C12.5523 5 13 5.44772 13 6Z"
-                                    stroke="#000000"
-                                    strokeWidth="2"
-                                    strokeLinecap="round"
-                                    strokeLinejoin="round"
-                                ></path>{" "}
-                            </g>
-                        </svg>
-                    </div>
+                    <div
+                        className={`absolute inset-y-0 left-1/2 w-1.5 -translate-x-1/2 rounded-full transition-colors ${
+                            isResizing
+                                ? "bg-ink/10"
+                                : "bg-transparent group-hover:bg-ink/10"
+                        }`}
+                    />
+                    <MoreVertical
+                        size={14}
+                        className="relative text-warm-gray"
+                    />
                 </div>
             </aside>
         </SidebarContextProvider>
